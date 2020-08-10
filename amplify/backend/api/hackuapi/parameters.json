@@ -1,0 +1,11 @@
+{
+    "AppSyncApiName": "hackuapi",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authhacku2020cd550e29",
+            "Outputs.UserPoolId"
+        ]
+    }
+}
