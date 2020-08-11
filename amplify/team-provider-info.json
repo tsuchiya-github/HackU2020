@@ -1,0 +1,20 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-hacku2020-dev-144145-authRole",
+            "UnauthRoleArn": "arn:aws:iam::196660586489:role/amplify-hacku2020-dev-144145-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::196660586489:role/amplify-hacku2020-dev-144145-authRole",
+            "Region": "ap-northeast-1",
+            "DeploymentBucketName": "amplify-hacku2020-dev-144145-deployment",
+            "UnauthRoleName": "amplify-hacku2020-dev-144145-unauthRole",
+            "StackName": "amplify-hacku2020-dev-144145",
+            "StackId": "arn:aws:cloudformation:ap-northeast-1:196660586489:stack/amplify-hacku2020-dev-144145/586f9860-db95-11ea-aec5-0ef015a9ecfc",
+            "AmplifyAppId": "d2akw61lbykfbl"
+        },
+        "categories": {
+            "auth": {
+                "hacku2020c8c80c96": {}
+            }
+        }
+    }
+}

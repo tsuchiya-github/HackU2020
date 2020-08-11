@@ -1,0 +1,29 @@
+{
+  "runtimes": [
+    {
+      "value": "nodejs",
+      "name": "NodeJS",
+      "layerExecutablePath": "nodejs/node_modules",
+      "cloudTemplateValue": "nodejs12.x"
+    },
+    {
+      "value": "python",
+      "name": "Python",
+      "layerExecutablePath": "python/lib/python3.8/site-packages",
+      "cloudTemplateValue": "python3.8"
+    }
+  ],
+  "layerVersionMap": {
+    "1": {
+      "permissions": [
+        {
+          "type": "public"
+        },
+        {
+          "type": "private"
+        }
+      ],
+      "hash": "dcXIILFOGSAbwE+gJ5u8LVxecqD5S72eBHZwYBfKF6Y="
+    }
+  }
+}
