@@ -1,5 +1,5 @@
 projects:
-  hacku2020api:
+  hacku2020todoapi:
     schemaPath: src/graphql/schema.json
     includes:
       - src/graphql/**/*.js

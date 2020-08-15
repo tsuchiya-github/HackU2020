@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "hacku2020c8c80c96_identitypool_c8c80c96",
-    "allowUnauthenticatedIdentities": true,
-    "resourceNameTruncated": "hacku2c8c80c96",
-    "userPoolName": "hacku2020c8c80c96_userpool_c8c80c96",
+    "identityPoolName": "hacku2020664d13c3_identitypool_664d13c3",
+    "allowUnauthenticatedIdentities": false,
+    "resourceNameTruncated": "hacku2664d13c3",
+    "userPoolName": "hacku2020664d13c3_userpool_664d13c3",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -28,10 +28,10 @@
     "userpoolClientReadAttributes": [
         "email"
     ],
-    "userpoolClientLambdaRole": "hacku2c8c80c96_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "hacku2664d13c3_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "c8c80c96",
-    "resourceName": "hacku2020c8c80c96",
+    "sharedId": "664d13c3",
+    "resourceName": "hacku2020664d13c3",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [
@@ -46,9 +46,6 @@
         ]
     },
     "useDefault": "default",
-    "usernameAttributes": [
-        "email"
-    ],
     "userPoolGroupList": [],
     "dependsOn": []
 }

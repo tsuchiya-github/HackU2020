@@ -1,13 +1,13 @@
 {
 	"auth": {
-		"hacku2020c8c80c96": {
+		"hacku2020664d13c3": {
 			"service": "Cognito",
 			"providerPlugin": "awscloudformation",
 			"dependsOn": []
 		}
 	},
 	"api": {
-		"hacku2020api": {
+		"hacku2020todoapi": {
 			"service": "AppSync",
 			"providerPlugin": "awscloudformation",
 			"output": {
@@ -15,7 +15,7 @@
 					"defaultAuthentication": {
 						"authenticationType": "AMAZON_COGNITO_USER_POOLS",
 						"userPoolConfig": {
-							"userPoolId": "authhacku2020c8c80c96"
+							"userPoolId": "authhacku2020664d13c3"
 						}
 					},
 					"additionalAuthenticationProviders": []

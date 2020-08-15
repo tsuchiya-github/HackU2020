@@ -11,12 +11,17 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^5.9.6",
+    "@react-navigation/material-bottom-tabs": "^5.2.16",
+    "@react-navigation/native": "^5.7.3",
     "amazon-cognito-identity-js": "^4.3.3",
     "aws-amplify": "^3.0.23",
     "aws-amplify-react-native": "^4.2.4",
     "native-base": "^2.13.13",
     "react": "16.13.1",
-    "react-native": "0.63.2"
+    "react-native": "0.63.2",
+    "react-native-easy-grid": "^0.2.2",
+    "react-native-modal": "^11.5.6",
+    "react-native-paper": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
