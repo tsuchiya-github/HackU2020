@@ -8,20 +8,10 @@ import Account from "./screens/tabs/Account";
 import { Icon } from "native-base";
 import { withAuthenticator } from "aws-amplify-react-native";
 import Amplify from "aws-amplify";
+import config from "./aws-exports";
 
 Amplify.configure({
-  Auth: {
-    // REQUIRED - Amazon Cognito Identity Pool ID
-    identityPoolId: "ap-northeast-1:4a662227-265d-4b15-8573-7ca2629687fd",
-
-    // REQUIRED - Amazon Cognito Region
-    region: "ap-northeast-1",
-    // OPTIONAL - Amazon Cognito User Pool ID
-    userPoolId: "ap-northeast-1_od59uSDaH",
-    // OPTIONAL - Amazon Cognito Web Client ID
-    userPoolWebClientId: "2atme8u1ko30pttptd4lai12uu",
-    oauth: {},
-  },
+  ...config,
   Analytics: {
     disabled: true,
   },

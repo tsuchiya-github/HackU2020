@@ -1,5 +1,5 @@
 {
-    "AppSyncApiName": "hacku2020todoapi",
+    "AppSyncApiName": "todoapi",
     "DynamoDBBillingMode": "PAY_PER_REQUEST",
     "DynamoDBEnableServerSideEncryption": false,
     "AuthCognitoUserPoolId": {
