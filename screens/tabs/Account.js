@@ -62,8 +62,8 @@ class User extends Component {
   render() {
     return (
       <View>
-        <Text style={{ fontSize: 30 }}> {this.state.username} </Text>
-        <Text style={{ fontSize: 30 }}> {this.state.email} </Text>
+        <Text style={{ fontSize: 20 }}>{this.state.username}</Text>
+        <Text style={{ fontSize: 20 }}>{this.state.email}</Text>
       </View>
     );
   }
@@ -86,7 +86,8 @@ export default class Account extends Component {
   // };
 
   render() {
-    const thumbnail_uri = "https://i.imgur.com/yUbYzGI.png";
+    const thumbnail_uri =
+      "https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/mio2.jpeg";
 
     return (
       <Container>
@@ -98,7 +99,13 @@ export default class Account extends Component {
             <Row size={10} />
             <Row size={30}>
               <Thumbnail
-                style={{ height: 200, width: 200, borderRadius: 100 }}
+                style={{
+                  height: 200,
+                  width: 200,
+                  borderRadius: 100,
+                  borderColor: "green",
+                  borderWidth: 1,
+                }}
                 source={{ uri: thumbnail_uri }}
               />
             </Row>

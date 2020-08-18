@@ -82,7 +82,8 @@ class App extends Component {
                   style={{ color: "white" }}
                 />
               ),
-              tabBarColor: "hsla(210, 90%, 50%, 0.9)",
+              // tabBarColor: "hsla(210, 90%, 50%, 0.9)",
+              tabBarColor: "black",
             }}
           />
 
@@ -99,7 +100,8 @@ class App extends Component {
                   style={{ fontSize: 25, color: "white" }}
                 />
               ),
-              tabBarColor: "hsla(0, 90%, 50%, 0.7)",
+              // tabBarColor: "hsla(0, 90%, 50%, 0.7)",
+              tabBarColor: "black",
             }}
           />
 
@@ -116,7 +118,8 @@ class App extends Component {
                   style={{ color: "white" }}
                 />
               ),
-              tabBarColor: "hsla(150, 90%, 40%, 0.7)",
+              // tabBarColor: "hsla(150, 90%, 40%, 0.7)",
+              tabBarColor: "black",
             }}
           />
         </Tab.Navigator>

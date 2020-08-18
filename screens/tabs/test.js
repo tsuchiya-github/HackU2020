@@ -1,21 +1,6 @@
 import React, { useEffect, useState, Component } from "react";
-import { View, StyleSheet } from "react-native";
-import {
-  Container,
-  Header,
-  Button,
-  Content,
-  Input,
-  Text,
-  Item,
-  Card,
-  CardItem,
-  Left,
-  Body,
-  Right,
-  Icon,
-  Fab,
-} from "native-base";
+import { View, Text, StyleSheet, TextInput } from "react-native";
+import { Container, Header, Button, Content } from "native-base";
 
 import { API, graphqlOperation } from "aws-amplify";
 import { createTodo, deleteTodo } from "./../../src/graphql/mutations";
@@ -29,7 +14,7 @@ const App = () => {
   // Hook(stateなどのReactの機能をクラスを書かずに使えるようになる)
   const [formState, setFormState] = useState(initialState); //formに関する宣言
   const [todos, setTodos] = useState([]); //dynamoからfetchするデータに関する宣言
-  const [remove, setDelete] = useState(deleteState); //dynamoからdeleteするデータに関する宣言
+  const [remove, setDelete] = useState([]); //dynamoからdeleteするデータに関する宣言
 
   // コンポーネントをレンダリングする際に外部サーバからAPIを経由してデータを取得したり
   // コンポーネントが更新する度に別の処理を実行することができる
@@ -66,70 +51,55 @@ const App = () => {
   }
 
   // データを削除する非同期関数
-  async function removeTodo(removeId) {
-    try {
-      // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
-      await API.graphql(
-        graphqlOperation(deleteTodo, { input: { id: removeId } })
-      );
-      console.log("removeTodo called!", removeId);
-    } catch (err) {
-      console.log("error delete:", err);
-    }
-  }
-
-  // データに打ち消し線(タスククリア処理)をつける非同期関数
-  async function doneTodo() {
-    console.log("doneTodo called!");
+  async function removeTodo(a) {
+    // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
+    //const remove = { ...deleteState };
+    const remove = a;
+    console.log("removeTodo called!", remove);
   }
 
   // レンダリング
   return (
-    <Container>
-      <Item>
-        <Input
-          onChangeText={(val) => setInput("name", val)}
-          style={styles.input}
-          value={formState.name}
-          placeholder="時間"
-        />
-      </Item>
-      <Item>
-        <Input
-          onChangeText={(val) => setInput("description", val)}
-          style={styles.input}
-          value={formState.description}
-          placeholder="内容"
-        />
-      </Item>
-      <Content>
-        {todos.map((todo, index) => (
-          <Card key={todo.id ? todo.id : index}>
-            <CardItem itemHeader first>
-              <Body>
-                <Text style={styles.todoName}>{todo.name}</Text>
-                <Text>{todo.description}</Text>
-              </Body>
-              <Right>
-                <Icon type="FontAwesome" name="plus" onPress={doneTodo} />
-                <Icon
-                  type="FontAwesome"
-                  name="trash"
-                  onPress={() => removeTodo(todo.id)}
-                />
-              </Right>
-            </CardItem>
-          </Card>
-        ))}
-      </Content>
-      <Fab
-        style={{ backgroundColor: "#5067FF" }}
-        position="bottomRight"
-        onPress={addTodo}
-      >
-        <Icon type="FontAwesome" name="plus" />
-      </Fab>
-    </Container>
+    <View>
+      <TextInput
+        onChangeText={(val) => setInput("name", val)}
+        style={styles.input}
+        value={formState.name}
+        placeholder="Name"
+      />
+      <TextInput
+        onChangeText={(val) => setInput("description", val)}
+        style={styles.input}
+        value={formState.description}
+        placeholder="Description"
+      />
+      <Button large danger style={styles.button} onPress={addTodo}>
+        <Text style={styles.font}>Create Todo</Text>
+      </Button>
+
+      {todos.map((todo, index) => (
+        <View key={todo.id ? todo.id : index} style={styles.todo}>
+          <Grid>
+            <Col size={10}>
+              <Button>
+                <Text>done</Text>
+              </Button>
+            </Col>
+            <Col size={80}>
+              <Text style={styles.todoName}>{todo.name}</Text>
+              <Text>
+                {todo.description}, {todo.id}
+              </Text>
+            </Col>
+            <Col size={10}>
+              <Button onPress={() => removeTodo(todo.id)}>
+                <Text>delete</Text>
+              </Button>
+            </Col>
+          </Grid>
+        </View>
+      ))}
+    </View>
   );
 };
 
@@ -145,7 +115,9 @@ export default class AppCalendar extends Component {
         <Header style={{ backgroundColor: "green" }}>
           <Text style={styles.font}>Todo</Text>
         </Header>
-        <App />
+        <Content style={styles.container}>
+          <App />
+        </Content>
       </Container>
     );
   }
@@ -154,15 +126,13 @@ export default class AppCalendar extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "hsla(150, 90%, 50%, 0.2)",
   },
   todo: { marginBottom: 15, backgroundColor: "pink" },
-  // input: { height: 50, backgroundColor: "#ddd", marginBottom: 10, padding: 8 },
+  input: { height: 50, backgroundColor: "#ddd", marginBottom: 10, padding: 8 },
   todoName: { fontSize: 18 },
   font: {
-    fontSize: 20,
+    fontSize: 30,
     fontFamily: "Baskerville-Bold",
   },
   button: {
@@ -173,3 +143,5 @@ const styles = StyleSheet.create({
     fontFamily: "Baskerville-Bold",
   },
 });
+
+//export default App;
