@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Component } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Alert } from "react-native";
 import {
   Container,
   Header,
@@ -16,6 +16,7 @@ import {
   Icon,
   Fab,
 } from "native-base";
+import Swipeout from "react-native-swipeout";
 
 import { API, graphqlOperation } from "aws-amplify";
 import { createTodo, deleteTodo } from "./../../src/graphql/mutations";
@@ -60,6 +61,7 @@ const App = () => {
       setTodos([...todos, todo]);
       setFormState(initialState);
       await API.graphql(graphqlOperation(createTodo, { input: todo }));
+      fetchTodos();
     } catch (err) {
       console.log("error creating todo:", err);
     }
@@ -72,6 +74,7 @@ const App = () => {
       await API.graphql(
         graphqlOperation(deleteTodo, { input: { id: removeId } })
       );
+      fetchTodos();
       console.log("removeTodo called!", removeId);
     } catch (err) {
       console.log("error delete:", err);
@@ -80,12 +83,12 @@ const App = () => {
 
   // データに打ち消し線(タスククリア処理)をつける非同期関数
   async function doneTodo() {
-    console.log("doneTodo called!");
+    Alert.alert("doneTodo called!");
   }
 
   // レンダリング
   return (
-    <Container>
+    <Container style={{ padding: 10 }}>
       <Item>
         <Input
           onChangeText={(val) => setInput("name", val)}
@@ -102,23 +105,32 @@ const App = () => {
           placeholder="内容"
         />
       </Item>
-      <Content>
+      <Content style={{ padding: 10, backgroundColor: "grey" }}>
         {todos.map((todo, index) => (
           <Card key={todo.id ? todo.id : index}>
-            <CardItem itemHeader first>
-              <Body>
-                <Text style={styles.todoName}>{todo.name}</Text>
-                <Text>{todo.description}</Text>
-              </Body>
-              <Right>
-                <Icon type="FontAwesome" name="plus" onPress={doneTodo} />
-                <Icon
-                  type="FontAwesome"
-                  name="trash"
-                  onPress={() => removeTodo(todo.id)}
-                />
-              </Right>
-            </CardItem>
+            <Swipeout
+              right={[
+                {
+                  text: "delete",
+                  onPress: () => removeTodo(todo.id),
+                  backgroundColor: "red",
+                },
+              ]}
+              left={[
+                {
+                  text: "done",
+                  onPress: () => doneTodo(),
+                  backgroundColor: "blue",
+                },
+              ]}
+            >
+              <CardItem itemHeader first>
+                <Body>
+                  <Text style={styles.todoName}>{todo.name}</Text>
+                  <Text>{todo.description}</Text>
+                </Body>
+              </CardItem>
+            </Swipeout>
           </Card>
         ))}
       </Content>
@@ -162,7 +174,7 @@ const styles = StyleSheet.create({
   // input: { height: 50, backgroundColor: "#ddd", marginBottom: 10, padding: 8 },
   todoName: { fontSize: 18 },
   font: {
-    fontSize: 20,
+    fontSize: 30,
     fontFamily: "Baskerville-Bold",
   },
   button: {
