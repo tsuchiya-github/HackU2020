@@ -155,7 +155,7 @@ const App = () => {
               autoClose={true} //勝手に閉じる
               left={[
                 {
-                  text: todo.completed === true ? "undone" : "done",
+                  text: todo.completed === true ? "undo" : "done",
                   onPress: () => doneTodo(todo.completed, todo.id),
                   backgroundColor: "blue",
                 },
