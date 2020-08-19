@@ -16,6 +16,7 @@ Amplify.configure({
     disabled: true,
   },
 });
+console.disableYellowBox = true;
 
 const Tab = createMaterialBottomTabNavigator();
 

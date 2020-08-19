@@ -15,13 +15,13 @@ import {
   Right,
   Icon,
   Fab,
+  DatePicker,
 } from "native-base";
 import Swipeout from "react-native-swipeout";
 
 import { API, graphqlOperation } from "aws-amplify";
 import { createTodo, deleteTodo } from "./../../src/graphql/mutations";
 import { listTodos } from "./../../src/graphql/queries";
-import { Col, Row, Grid } from "react-native-easy-grid";
 
 const initialState = { name: "", description: "" }; //createするデータの初期値
 const deleteState = { id: "" }; //deleteするデータのidの初期値
@@ -83,29 +83,48 @@ const App = () => {
 
   // データに打ち消し線(タスククリア処理)をつける非同期関数
   async function doneTodo() {
-    Alert.alert("doneTodo called!");
+    Alert.alert("Conglatulations!");
   }
 
   // レンダリング
   return (
     <Container style={{ padding: 10 }}>
+      {/* DatePickerで日時指定させる場合 */}
+      {/* <Item>
+        <DatePicker
+          defaultDate={new Date()}
+          locale={"ja"}
+          timeZoneOffsetInMinutes={undefined}
+          modalTransparent={true}
+          animationType={"fade"}
+          androidMode={"default"}
+          placeHolderText="年月日"
+          textStyle={{ color: "green" }}
+          placeHolderTextStyle={{ color: "#d3d3d3" }}
+          onDateChange={(val) => setInput("name", val.toString().substr(4, 12))}
+          disabled={false}
+          value={formState.name}
+        />
+      </Item> */}
+
+      {/* 日時指定を文字入力させる場合 */}
       <Item>
         <Input
           onChangeText={(val) => setInput("name", val)}
-          style={styles.input}
           value={formState.name}
           placeholder="時間"
+          placeholderTextColor="#d3d3d3"
         />
       </Item>
       <Item>
         <Input
           onChangeText={(val) => setInput("description", val)}
-          style={styles.input}
           value={formState.description}
           placeholder="内容"
+          placeholderTextColor="#d3d3d3"
         />
       </Item>
-      <Content style={{ padding: 10, backgroundColor: "grey" }}>
+      <Content style={{ padding: 10, backgroundColor: "lightgreen" }}>
         {todos.map((todo, index) => (
           <Card key={todo.id ? todo.id : index}>
             <Swipeout
@@ -126,8 +145,8 @@ const App = () => {
             >
               <CardItem itemHeader first>
                 <Body>
-                  <Text style={styles.todoName}>{todo.name}</Text>
-                  <Text>{todo.description}</Text>
+                  <Text style={styles.todoName}>{todo.description}</Text>
+                  <Text>{todo.name}</Text>
                 </Body>
               </CardItem>
             </Swipeout>
@@ -171,7 +190,7 @@ const styles = StyleSheet.create({
     backgroundColor: "hsla(150, 90%, 50%, 0.2)",
   },
   todo: { marginBottom: 15, backgroundColor: "pink" },
-  // input: { height: 50, backgroundColor: "#ddd", marginBottom: 10, padding: 8 },
+  input: { height: 50, backgroundColor: "#ddd", marginBottom: 10, padding: 8 },
   todoName: { fontSize: 18 },
   font: {
     fontSize: 30,
