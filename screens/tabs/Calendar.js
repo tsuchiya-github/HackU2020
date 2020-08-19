@@ -20,10 +20,14 @@ import {
 import Swipeout from "react-native-swipeout";
 
 import { API, graphqlOperation } from "aws-amplify";
-import { createTodo, deleteTodo } from "./../../src/graphql/mutations";
+import {
+  createTodo,
+  deleteTodo,
+  updateTodo,
+} from "./../../src/graphql/mutations";
 import { listTodos } from "./../../src/graphql/queries";
 
-const initialState = { name: "", description: "" }; //createするデータの初期値
+const initialState = { name: "", description: "", completed: false }; //createするデータの初期値
 const deleteState = { id: "" }; //deleteするデータのidの初期値
 
 const App = () => {
@@ -81,8 +85,21 @@ const App = () => {
     }
   }
 
-  // データに打ち消し線(タスククリア処理)をつける非同期関数
-  async function doneTodo() {
+  // データ に打ち消し線(タスククリア処理)をつける非同期関数
+  async function doneTodo(Comp, Id) {
+    try {
+      // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
+      await API.graphql(
+        //graphqlOperation(updateTodo, { input: { id: Id , completed: ((completed===false)? true : false)}})
+        graphqlOperation(updateTodo, {
+          input: { id: Id, completed: Comp === false ? true : false },
+        })
+      );
+      fetchTodos();
+      console.log("DoneTodo called!", Id);
+    } catch (err) {
+      console.log("error delete:", err);
+    }
     Alert.alert("Conglatulations!");
   }
 
@@ -135,18 +152,26 @@ const App = () => {
                   backgroundColor: "red",
                 },
               ]}
+              autoClose={true} //勝手に閉じる
               left={[
                 {
-                  text: "done",
-                  onPress: () => doneTodo(),
+                  text: todo.completed === true ? "undone" : "done",
+                  onPress: () => doneTodo(todo.completed, todo.id),
                   backgroundColor: "blue",
                 },
               ]}
             >
-              <CardItem itemHeader first>
+              <CardItem
+                header
+                style={{
+                  backgroundColor: todo.completed === true ? "yellow" : "white",
+                }}
+              >
                 <Body>
                   <Text style={styles.todoName}>{todo.description}</Text>
-                  <Text>{todo.name}</Text>
+                  <Text>
+                    {todo.name},{String(todo.completed)}
+                  </Text>
                 </Body>
               </CardItem>
             </Swipeout>

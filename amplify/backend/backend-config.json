@@ -1,65 +1,65 @@
 {
-    "auth": {
-        "hacku2020664d13c3": {
-            "service": "Cognito",
-            "providerPlugin": "awscloudformation",
-            "dependsOn": []
-        }
-    },
-    "api": {
-        "todoapi": {
-            "service": "AppSync",
-            "providerPlugin": "awscloudformation",
-            "output": {
-                "authConfig": {
-                    "defaultAuthentication": {
-                        "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-                        "userPoolConfig": {
-                            "userPoolId": "authhacku2020664d13c3"
-                        }
-                    },
-                    "additionalAuthenticationProviders": []
-                }
-            }
-        }
-    },
-    "storage": {
-        "hacku2020s3": {
-            "service": "S3",
-            "providerPlugin": "awscloudformation"
-        }
-    },
-    "function": {
-        "hacku20208a4d3a4b": {
-            "runtimes": [
-                {
-                    "value": "nodejs",
-                    "name": "NodeJS",
-                    "layerExecutablePath": "nodejs/node_modules",
-                    "cloudTemplateValue": "nodejs12.x"
-                },
-                {
-                    "value": "python",
-                    "name": "Python",
-                    "layerExecutablePath": "python/lib/python3.8/site-packages",
-                    "cloudTemplateValue": "python3.8"
-                }
-            ],
-            "layerVersionMap": {
-                "1": {
-                    "permissions": [
-                        {
-                            "type": "public"
-                        },
-                        {
-                            "type": "private"
-                        }
-                    ]
-                }
-            },
-            "providerPlugin": "awscloudformation",
-            "service": "LambdaLayer",
-            "build": true
-        }
-    }
+	"auth": {
+		"hacku2020664d13c3": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	},
+	"api": {
+		"todoapi": {
+			"service": "AppSync",
+			"providerPlugin": "awscloudformation",
+			"output": {
+				"authConfig": {
+					"defaultAuthentication": {
+						"authenticationType": "AMAZON_COGNITO_USER_POOLS",
+						"userPoolConfig": {
+							"userPoolId": "authhacku2020664d13c3"
+						}
+					},
+					"additionalAuthenticationProviders": []
+				}
+			}
+		}
+	},
+	"storage": {
+		"hacku2020s3": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
+	},
+	"function": {
+		"hacku20208a4d3a4b": {
+			"runtimes": [
+				{
+					"value": "nodejs",
+					"name": "NodeJS",
+					"layerExecutablePath": "nodejs/node_modules",
+					"cloudTemplateValue": "nodejs12.x"
+				},
+				{
+					"value": "python",
+					"name": "Python",
+					"layerExecutablePath": "python/lib/python3.8/site-packages",
+					"cloudTemplateValue": "python3.8"
+				}
+			],
+			"layerVersionMap": {
+				"1": {
+					"permissions": [
+						{
+							"type": "public"
+						},
+						{
+							"type": "private"
+						}
+					]
+				}
+			},
+			"providerPlugin": "awscloudformation",
+			"service": "LambdaLayer",
+			"build": true
+		}
+	}
 }
