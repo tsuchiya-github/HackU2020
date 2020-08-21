@@ -25,16 +25,26 @@ import {
   deleteTodo,
   updateTodo,
 } from "./../../src/graphql/mutations";
-import { listTodos } from "./../../src/graphql/queries";
+import {
+  listTodos,
+  showlistTodos,
+  listCounts,
+  archiveCounts,
+} from "./../../src/graphql/queries";
 
-const initialState = { name: "", description: "", completed: false }; //createするデータの初期値
-const deleteState = { id: "" }; //deleteするデータのidの初期値
+const initialState = {
+  name: "",
+  description: "",
+  completed: false,
+  archive: false,
+}; //createするデータの初期値
 
 const App = () => {
   // Hook(stateなどのReactの機能をクラスを書かずに使えるようになる)
   const [formState, setFormState] = useState(initialState); //formに関する宣言
   const [todos, setTodos] = useState([]); //dynamoからfetchするデータに関する宣言
-  const [remove, setDelete] = useState(deleteState); //dynamoからdeleteするデータに関する宣言
+  const [total, setTotal] = useState(null); //dynamoからcountするデータに関する宣言
+  const [archive, setArchive] = useState(null); //dynamoからcountするデータに関する宣言
 
   // コンポーネントをレンダリングする際に外部サーバからAPIを経由してデータを取得したり
   // コンポーネントが更新する度に別の処理を実行することができる
@@ -49,9 +59,22 @@ const App = () => {
   // データを取得する非同期関数
   async function fetchTodos() {
     try {
-      const todoData = await API.graphql(graphqlOperation(listTodos));
-      const todos = todoData.data.listTodos.items;
+      const todoData = await API.graphql(graphqlOperation(showlistTodos));
+      var todos = todoData.data.listTodos.items;
+      todos.sort(function (a, b) {
+        return new Date(a.name).getTime() - new Date(b.name).getTime();
+      });
       setTodos(todos);
+
+      const countArchives = await API.graphql(graphqlOperation(archiveCounts));
+      const countA = countArchives.data.listTodos.items;
+      const archive = Object.keys(countA).length;
+      setArchive(archive);
+
+      const countTodos = await API.graphql(graphqlOperation(listCounts));
+      const countD = countTodos.data.listTodos.items;
+      const total = Object.keys(countD).length;
+      setTotal(total);
     } catch (err) {
       console.log("error fetching todos", err);
     }
@@ -76,7 +99,9 @@ const App = () => {
     try {
       // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
       await API.graphql(
-        graphqlOperation(deleteTodo, { input: { id: removeId } })
+        graphqlOperation(deleteTodo, {
+          input: { id: removeId },
+        })
       );
       fetchTodos();
       console.log("removeTodo called!", removeId);
@@ -90,17 +115,47 @@ const App = () => {
     try {
       // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
       await API.graphql(
-        //graphqlOperation(updateTodo, { input: { id: Id , completed: ((completed===false)? true : false)}})
         graphqlOperation(updateTodo, {
-          input: { id: Id, completed: Comp === false ? true : false },
+          input: {
+            id: Id,
+            completed: Comp === false ? true : false,
+          },
         })
       );
       fetchTodos();
-      console.log("DoneTodo called!", Id);
+      // const countTodos = await API.graphql(graphqlOperation(listCounts));
+      // const counts = countTodos.data.listTodos.items;
+      // console.log("Trueの数:", Object.keys(counts).length);
+      // const total = Object.keys(counts).length;
+      // setTotal(total);
+      // console.log(counts);
     } catch (err) {
-      console.log("error delete:", err);
+      console.log("error doneTodo:", err);
     }
-    Alert.alert("Conglatulations!");
+  }
+
+  // データをアーカイブする非同期関数
+  async function archiveTodo(Id) {
+    try {
+      // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
+      await API.graphql(
+        graphqlOperation(updateTodo, {
+          input: {
+            id: Id,
+            archive: true,
+          },
+        })
+      );
+      fetchTodos();
+      // const countArchives = await API.graphql(graphqlOperation(archiveCounts));
+      // const counts = countArchives.data.listTodos.items;
+      // console.log("アーカイブの数:", Object.keys(counts).length);
+      // const archive = Object.keys(counts).length;
+      // setArchive(archive);
+      // console.log(counts);
+    } catch (err) {
+      console.log("error archive:", err);
+    }
   }
 
   // レンダリング
@@ -129,7 +184,7 @@ const App = () => {
         <Input
           onChangeText={(val) => setInput("name", val)}
           value={formState.name}
-          placeholder="時間"
+          placeholder="MM/DD/YY HH:SS"
           placeholderTextColor="#d3d3d3"
         />
       </Item>
@@ -147,31 +202,72 @@ const App = () => {
             <Swipeout
               right={[
                 {
-                  text: "delete",
-                  onPress: () => removeTodo(todo.id),
-                  backgroundColor: "red",
+                  // text: "delete",
+                  // text: todo.completed === false ? "delete" : "archive",
+                  component: (
+                    <View
+                      style={{
+                        flex: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Icon
+                        type="FontAwesome"
+                        name="archive"
+                        style={{ color: "white" }}
+                      />
+                      <Text style={{ color: "white" }}>
+                        {todo.completed === false ? "delete" : "archive"}
+                      </Text>
+                    </View>
+                  ),
+                  onPress: () =>
+                    todo.completed === false
+                      ? removeTodo(todo.id)
+                      : archiveTodo(todo.id),
+                  // backgroundColor: "red",
+                  backgroundColor: todo.completed === true ? "orange" : "red",
                 },
               ]}
               autoClose={true} //勝手に閉じる
               left={[
                 {
-                  text: todo.completed === true ? "undo" : "done",
+                  // text: todo.completed === true ? "undo" : "done",
+                  component: (
+                    <View
+                      style={{
+                        flex: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Icon
+                        type="FontAwesome"
+                        name="check"
+                        style={{ color: "white" }}
+                      />
+                      <Text style={{ color: "white" }}>
+                        {todo.completed === true ? "undo" : "done"}
+                      </Text>
+                    </View>
+                  ),
                   onPress: () => doneTodo(todo.completed, todo.id),
-                  backgroundColor: "blue",
+                  backgroundColor:
+                    todo.completed === true ? "royalblue" : "blue",
                 },
               ]}
             >
               <CardItem
                 header
                 style={{
-                  backgroundColor: todo.completed === true ? "yellow" : "white",
+                  backgroundColor:
+                    todo.completed === true ? "#b3b3b3" : "white",
                 }}
               >
                 <Body>
                   <Text style={styles.todoName}>{todo.description}</Text>
-                  <Text>
-                    {todo.name},{String(todo.completed)}
-                  </Text>
+                  <Text>{todo.name}</Text>
                 </Body>
               </CardItem>
             </Swipeout>
@@ -185,6 +281,8 @@ const App = () => {
       >
         <Icon type="FontAwesome" name="plus" />
       </Fab>
+      <Text>Doneした数:{total}</Text>
+      <Text>Archiveした数:{archive}</Text>
     </Container>
   );
 };

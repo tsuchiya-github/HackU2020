@@ -7,6 +7,7 @@ import AppCalendar from "./screens/tabs/Calendar";
 import Account from "./screens/tabs/Account";
 import { Icon } from "native-base";
 import { withAuthenticator } from "aws-amplify-react-native";
+import AppIntroSlider from "react-native-app-intro-slider";
 import Amplify from "aws-amplify";
 import config from "./aws-exports";
 
@@ -19,6 +20,41 @@ Amplify.configure({
 console.disableYellowBox = true;
 
 const Tab = createMaterialBottomTabNavigator();
+
+const slides = [
+  {
+    key: "s1",
+    text:
+      "Eggtaskはタスクをこなすことで\nキャラを育成するリマインダーアプリです!",
+    title: "インストール\nありがとうございます!",
+    image: {
+      uri:
+        "https://raw.githubusercontent.com/AboutReact/sampleresource/master/intro_flight_ticket_booking.png",
+    },
+    backgroundColor: "rgba(248, 203, 173, 1.0)",
+  },
+  {
+    key: "s2",
+    title: "あなたの予定を入れてみよう",
+    text:
+      "予定に応じてタスクが与えられるよ!\n制限時間内にタスクをこなすとキャラが育つよ!",
+    image: {
+      uri:
+        "https://raw.githubusercontent.com/AboutReact/sampleresource/master/intro_flight_ticket_booking.png",
+    },
+    backgroundColor: "#febe29",
+  },
+  {
+    key: "s3",
+    title: "さぁ，始めよう!",
+    text: "Googleアカウントと連携して\nあなただけの〇〇ごっちを育てよう!",
+    image: {
+      uri:
+        "https://raw.githubusercontent.com/AboutReact/sampleresource/master/intro_discount.png",
+    },
+    backgroundColor: "#22bcb5",
+  },
+];
 
 class App extends Component {
   async componentDidMount() {
@@ -62,6 +98,7 @@ class App extends Component {
     );
   };
   render() {
+    //アプリ画面
     return (
       <NavigationContainer>
         <Tab.Navigator
@@ -126,6 +163,17 @@ class App extends Component {
         </Tab.Navigator>
       </NavigationContainer>
     );
+    // //初期画面
+    // return (
+    //   <AppIntroSlider
+    //     data={slides}
+    //     renderItem={this._renderItem}
+    //     onDone={this._onDone}
+    //     showSkipButton={true}
+    //     bottomButton={true}
+    //     onSkip={this._onSkip}
+    //   />
+    // );
   }
 }
 const styles = StyleSheet.create({
@@ -146,8 +194,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 });
-
-// export default withAuthenticator(App);
 
 export default withAuthenticator(App, {
   signUpConfig: {

@@ -7,7 +7,6 @@ export const getTodo = /* GraphQL */ `
       id
       name
       description
-      completed
       createdAt
       updatedAt
     }
@@ -25,10 +24,47 @@ export const listTodos = /* GraphQL */ `
         name
         description
         completed
+        archive
         createdAt
         updatedAt
       }
       nextToken
+    }
+  }
+`;
+
+export const listCounts = /* GraphQL */ `
+  query ListCounts {
+    listTodos(filter: { completed: { eq: true } }) {
+      items {
+        completed
+      }
+    }
+  }
+`;
+
+export const archiveCounts = /* GraphQL */ `
+  query ListCounts {
+    listTodos(filter: { archive: { eq: true } }) {
+      items {
+        archive
+      }
+    }
+  }
+`;
+
+export const showlistTodos = /* GraphQL */ `
+  query ListCounts {
+    listTodos(filter: { archive: { eq: false } }) {
+      items {
+        id
+        name
+        description
+        completed
+        archive
+        createdAt
+        updatedAt
+      }
     }
   }
 `;

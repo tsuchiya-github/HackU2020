@@ -1,8 +1,17 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+} from "react-native";
 import { Container, Header, Icon, Fab, Button } from "native-base";
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from "react-native-modal";
+
+var x = "2"; //LV用
 
 export default class Home extends Component {
   constructor(props) {
@@ -36,76 +45,107 @@ export default class Home extends Component {
                 />
               </View>
             </Col>
-            <Col size={40}></Col>
+            <Col size={20}></Col>
+            {/* 追加 (hibi)    heder右上     */}
+            <Col size={20}>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backcolor: "white",
+                }}
+              >
+                <Text style={styles.abovefont}>Lv.{x}</Text>
+              </View>
+            </Col>
+            {/* 追加 (hibi)          */}
           </Grid>
         </Header>
 
         <Grid>
           <Row size={80}>
             <View style={styles.abovecontainer}>
-              <Fab
-                active={this.state.active}
-                direction="right"
-                containerStyle={{}}
-                style={{ backgroundColor: "#5067FF" }}
-                position="topLeft"
-                onPress={() => this.setState({ active: !this.state.active })}
+              {/* bg (Viewの中で有効) */}
+              <ImageBackground
+                source={{
+                  uri:
+                    "https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/bg-sample.jpeg",
+                }}
+                style={{ width: "100%", height: "100%" }}
               >
-                <Icon type="FontAwesome" name="list" />
-                <Button
-                  style={{ backgroundColor: "#34A34F" }}
-                  onPress={() => this.setState({ modalTrigger: true })}
+                <Fab
+                  active={this.state.active}
+                  direction="right"
+                  containerStyle={{}}
+                  style={{ backgroundColor: "#5067FF" }}
+                  position="topLeft"
+                  onPress={() => this.setState({ active: !this.state.active })}
                 >
-                  {/* モーダル */}
-                  <Modal
-                    isVisible={this.state.modalTrigger}
-                    swipeDirection={["up", "down", "left", "right"]}
-                    onSwipeComplete={() =>
-                      this.setState({ modalTrigger: false })
-                    }
-                    backdropOpacity={0.5}
-                    animationInTiming={700}
-                    animationOutTiming={700}
-                    animationIn="zoomIn"
-                    animationOut="zoomOut"
+                  <Icon type="FontAwesome" name="list" />
+                  <Button
+                    style={{ backgroundColor: "#34A34F" }}
+                    onPress={() => this.setState({ modalTrigger: true })}
                   >
-                    <View style={styles.modalView}>
-                      {/* バー */}
-                      <View style={styles.bar}></View>
-                      {/* 閉じるボタン */}
-                      <TouchableOpacity
-                        style={styles.modalButton}
-                        onPress={() => this.setState({ modalTrigger: false })}
-                      >
-                        <Text style={styles.font}>
-                          棒グラフで現在のランク分布を表示させるモーダル
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </Modal>
-                  <Icon type="FontAwesome" name="trophy" />
-                </Button>
-                <Button style={{ backgroundColor: "#3B5998" }}>
-                  <Icon name="logo-facebook" />
-                </Button>
-                <Button disabled style={{ backgroundColor: "#DD5144" }}>
-                  <Icon name="mail" />
-                </Button>
-              </Fab>
+                    {/* モーダル */}
+                    <Modal
+                      isVisible={this.state.modalTrigger}
+                      swipeDirection={["up", "down", "left", "right"]}
+                      onSwipeComplete={() =>
+                        this.setState({ modalTrigger: false })
+                      }
+                      backdropOpacity={0.5}
+                      animationInTiming={700}
+                      animationOutTiming={700}
+                      animationIn="zoomIn"
+                      animationOut="zoomOut"
+                    >
+                      <View style={styles.modalView}>
+                        {/* バー */}
+                        <View style={styles.bar}></View>
+                        {/* 閉じるボタン */}
+                        <TouchableOpacity
+                          style={styles.modalButton}
+                          onPress={() => this.setState({ modalTrigger: false })}
+                        >
+                          <Text style={styles.font}>
+                            棒グラフで現在のランク分布を表示させるモーダル
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </Modal>
+                    <Icon type="FontAwesome" name="trophy" />
+                  </Button>
+                  <Button style={{ backgroundColor: "#3B5998" }}>
+                    <Icon name="logo-facebook" />
+                  </Button>
+                  <Button disabled style={{ backgroundColor: "#DD5144" }}>
+                    <Icon name="mail" />
+                  </Button>
+                </Fab>
 
-              <Icon
+                {/* <Icon
                 type="FontAwesome"
                 name="twitter"
                 style={{ fontSize: 300, color: "black" }}
-              />
+              /> */}
 
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate("AppCalendar");
-                }}
-              >
-                <Text style={styles.button}>Button</Text>
-              </TouchableOpacity>
+                <Image
+                  //source={{ uri: 'https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/mio'+x+'.jpeg' }}
+                  // キャラクター
+                  source={{
+                    uri:
+                      "https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/smple.gif",
+                  }}
+                  style={{ width: 170, height: 158 }}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate("AppCalendar");
+                  }}
+                >
+                  <Text style={styles.button}>Let's Add Todo</Text>
+                </TouchableOpacity>
+              </ImageBackground>
             </View>
           </Row>
           <Row size={20}>
@@ -173,5 +213,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     position: "absolute",
     top: 10,
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "center",
   },
 });
