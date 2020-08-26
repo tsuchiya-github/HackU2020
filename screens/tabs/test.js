@@ -1,147 +1,221 @@
-import React, { useEffect, useState, Component } from "react";
-import { View, Text, StyleSheet, TextInput } from "react-native";
-import { Container, Header, Button, Content } from "native-base";
-
-import { API, graphqlOperation } from "aws-amplify";
-import { createTodo, deleteTodo } from "./../../src/graphql/mutations";
-import { listTodos } from "./../../src/graphql/queries";
+import React, { Component } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+} from "react-native";
+import { Container, Header, Icon, Fab, Button } from "native-base";
 import { Col, Row, Grid } from "react-native-easy-grid";
+import Modal from "react-native-modal";
 
-const initialState = { name: "", description: "" }; //createするデータの初期値
-const deleteState = { id: "" }; //deleteするデータのidの初期値
+var x = "2"; //LV用
 
-const App = () => {
-  // Hook(stateなどのReactの機能をクラスを書かずに使えるようになる)
-  const [formState, setFormState] = useState(initialState); //formに関する宣言
-  const [todos, setTodos] = useState([]); //dynamoからfetchするデータに関する宣言
-  const [remove, setDelete] = useState([]); //dynamoからdeleteするデータに関する宣言
-
-  // コンポーネントをレンダリングする際に外部サーバからAPIを経由してデータを取得したり
-  // コンポーネントが更新する度に別の処理を実行することができる
-  useEffect(() => {
-    fetchTodos(); //コンポーネントが更新する度にdynamoからデータを取得する
-  }, []);
-
-  function setInput(key, value) {
-    setFormState({ ...formState, [key]: value });
-  }
-
-  // データを取得する非同期関数
-  async function fetchTodos() {
-    try {
-      const todoData = await API.graphql(graphqlOperation(listTodos));
-      const todos = todoData.data.listTodos.items;
-      setTodos(todos);
-    } catch (err) {
-      console.log("error fetching todos", err);
-    }
-  }
-
-  // データを追加する非同期関数
-  async function addTodo() {
-    try {
-      const todo = { ...formState };
-      console.log(todo);
-      setTodos([...todos, todo]);
-      setFormState(initialState);
-      await API.graphql(graphqlOperation(createTodo, { input: todo }));
-    } catch (err) {
-      console.log("error creating todo:", err);
-    }
-  }
-
-  // データを削除する非同期関数
-  async function removeTodo(a) {
-    // idを取得し，await API.graphql(graphqlOperation(deleteTodo, { input: { id: todoId }}));を実行したい
-    //const remove = { ...deleteState };
-    const remove = a;
-    console.log("removeTodo called!", remove);
-  }
-
-  // レンダリング
-  return (
-    <View>
-      <TextInput
-        onChangeText={(val) => setInput("name", val)}
-        style={styles.input}
-        value={formState.name}
-        placeholder="Name"
-      />
-      <TextInput
-        onChangeText={(val) => setInput("description", val)}
-        style={styles.input}
-        value={formState.description}
-        placeholder="Description"
-      />
-      <Button large danger style={styles.button} onPress={addTodo}>
-        <Text style={styles.font}>Create Todo</Text>
-      </Button>
-
-      {todos.map((todo, index) => (
-        <View key={todo.id ? todo.id : index} style={styles.todo}>
-          <Grid>
-            <Col size={10}>
-              <Button>
-                <Text>done</Text>
-              </Button>
-            </Col>
-            <Col size={80}>
-              <Text style={styles.todoName}>{todo.name}</Text>
-              <Text>
-                {todo.description}, {todo.id}
-              </Text>
-            </Col>
-            <Col size={10}>
-              <Button onPress={() => removeTodo(todo.id)}>
-                <Text>delete</Text>
-              </Button>
-            </Col>
-          </Grid>
-        </View>
-      ))}
-    </View>
-  );
-};
-
-export default class AppCalendar extends Component {
+export default class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      active: false,
+      modalTrigger: false,
+    };
   }
-
   render() {
     return (
       <Container>
-        <Header style={{ backgroundColor: "green" }}>
-          <Text style={styles.font}>Todo</Text>
+        <Header style={{ backgroundColor: "blue" }}>
+          <Grid>
+            <Col size={40}>
+              {/* cognitoのユーザ名を表示させる */}
+              <Text style={styles.abovefont}>tsuchiya</Text>
+            </Col>
+            <Col size={20}>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backcolor: "white",
+                }}
+              >
+                <Icon
+                  style={{ fontSize: 50 }}
+                  type="FontAwesome"
+                  name="user-circle"
+                />
+              </View>
+            </Col>
+            <Col size={20}></Col>
+            {/* 追加 (hibi)    heder右上     */}
+            <Col size={20}>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backcolor: "white",
+                }}
+              >
+                <Text style={styles.abovefont}>Lv.{x}</Text>
+              </View>
+            </Col>
+          </Grid>
         </Header>
-        <Content style={styles.container}>
-          <App />
-        </Content>
+
+        <Grid>
+          <Row size={80}>
+            <View style={styles.abovecontainer}>
+              {/* bg (Viewの中で有効) */}
+              <ImageBackground
+                source={{
+                  uri:
+                    "https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/bg-sample.jpeg",
+                }}
+                style={{ width: "100%", height: "100%" }}
+              >
+                <Fab
+                  active={this.state.active}
+                  direction="right"
+                  containerStyle={{}}
+                  style={{ backgroundColor: "#5067FF" }}
+                  position="topLeft"
+                  onPress={() => this.setState({ active: !this.state.active })}
+                >
+                  <Icon type="FontAwesome" name="list" />
+                  <Button
+                    style={{ backgroundColor: "#34A34F" }}
+                    onPress={() => this.setState({ modalTrigger: true })}
+                  >
+                    {/* モーダル */}
+                    <Modal
+                      isVisible={this.state.modalTrigger}
+                      swipeDirection={["up", "down", "left", "right"]}
+                      onSwipeComplete={() =>
+                        this.setState({ modalTrigger: false })
+                      }
+                      backdropOpacity={0.5}
+                      animationInTiming={700}
+                      animationOutTiming={700}
+                      animationIn="zoomIn"
+                      animationOut="zoomOut"
+                    >
+                      <View style={styles.modalView}>
+                        {/* バー */}
+                        <View style={styles.bar}></View>
+                        {/* 閉じるボタン */}
+                        <TouchableOpacity
+                          style={styles.modalButton}
+                          onPress={() => this.setState({ modalTrigger: false })}
+                        >
+                          <Text style={styles.font}>
+                            棒グラフで現在のランク分布を表示させるモーダル
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </Modal>
+                    <Icon type="FontAwesome" name="trophy" />
+                  </Button>
+                  <Button style={{ backgroundColor: "#3B5998" }}>
+                    <Icon name="logo-facebook" />
+                  </Button>
+                  <Button disabled style={{ backgroundColor: "#DD5144" }}>
+                    <Icon name="mail" />
+                  </Button>
+                </Fab>
+
+                {/* <Icon
+                type="FontAwesome"
+                name="twitter"
+                style={{ fontSize: 300, color: "black" }}
+              /> */}
+
+                <Image
+                  //source={{ uri: 'https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/mio'+x+'.jpeg' }}
+                  // キャラクター
+                  source={{
+                    uri:
+                      "https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/smple.gif",
+                  }}
+                  style={{ width: 170, height: 158 }}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate("AppCalendar");
+                  }}
+                >
+                  <Text style={styles.button}>Let's Add Todo</Text>
+                </TouchableOpacity>
+              </ImageBackground>
+            </View>
+          </Row>
+          <Row size={20}>
+            <View style={styles.belowcontainer}>
+              <Text style={styles.belowfont}>aaaaaa</Text>
+            </View>
+          </Row>
+        </Grid>
       </Container>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  abovecontainer: {
     flex: 1,
-    backgroundColor: "hsla(150, 90%, 50%, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: "hsla(210, 90%, 50%, 0.2)",
+    backgroundColor: "white",
   },
-  todo: { marginBottom: 15, backgroundColor: "pink" },
-  input: { height: 50, backgroundColor: "#ddd", marginBottom: 10, padding: 8 },
-  todoName: { fontSize: 18 },
-  font: {
+  belowcontainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "hsla(255, 90%, 50%, 0.2)",
+  },
+  abovefont: {
+    fontSize: 20,
+    fontFamily: "Baskerville-Bold",
+    margin: 15,
+    color: "white",
+  },
+  belowfont: {
     fontSize: 30,
     fontFamily: "Baskerville-Bold",
+    margin: 15,
+    color: "black",
   },
   button: {
     fontSize: 30,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "black",
     padding: 5,
+    backgroundColor: "white",
     borderRadius: 10,
     overflow: "hidden",
     fontFamily: "Baskerville-Bold",
   },
+  modalView: {
+    backgroundColor: "hsl(0, 0%, 97%)",
+    width: "80%",
+    height: 200,
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+  },
+  bar: {
+    height: 7,
+    borderRadius: 20,
+    alignSelf: "center",
+    backgroundColor: "lightgray",
+    width: 50,
+    marginTop: 5,
+    position: "absolute",
+    top: 10,
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "center",
+  },
 });
-
-//export default App;

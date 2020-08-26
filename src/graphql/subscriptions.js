@@ -8,6 +8,8 @@ export const onCreateTodo = /* GraphQL */ `
       name
       description
       completed
+      archive
+      cognitoID
       createdAt
       updatedAt
     }
@@ -20,6 +22,8 @@ export const onUpdateTodo = /* GraphQL */ `
       name
       description
       completed
+      archive
+      cognitoID
       createdAt
       updatedAt
     }
@@ -32,8 +36,34 @@ export const onDeleteTodo = /* GraphQL */ `
       name
       description
       completed
+      archive
+      cognitoID
       createdAt
       updatedAt
+    }
+  }
+`;
+
+export const onDeleteInfo = /* GraphQL */ `
+  subscription OnDeleteInfo {
+    onDeleteInfo {
+      cognitoID
+      type
+      gen
+      age
+      lv
+    }
+  }
+`;
+
+export const onUpdateInfo = /* GraphQL */ `
+  subscription OnUpdateInfo {
+    onUpdateInfo {
+      cognitoID
+      type
+      gen
+      age
+      lv
     }
   }
 `;

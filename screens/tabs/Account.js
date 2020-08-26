@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, ImageBackground } from "react-native";
 import { Container, Header, Thumbnail, Button, Icon } from "native-base";
 import { Auth } from "aws-amplify";
 import { Col, Row, Grid } from "react-native-easy-grid";
+import { CognitoUserPool } from "amazon-cognito-identity-js";
 
 // import { listPosts } from "./../../src/graphql/queries";
 // import Amplify from "aws-amplify";
@@ -37,12 +38,13 @@ class User extends Component {
     };
   }
   async componentDidMount() {
-    const userinfo = await Auth.currentUserInfo()
+    await Auth.currentUserInfo()
       .then((result) => {
         // 処理結果が返却されるので、あとは好きな処理をする
         var result = JSON.stringify(result);
         result = JSON.parse(result);
         console.log(result.username);
+        console.log(result.id);
         var attributes = JSON.stringify(result.attributes);
         attributes = JSON.parse(attributes);
         console.log(attributes.email);
@@ -56,7 +58,6 @@ class User extends Component {
         // エラーハンドリングする
         console.error(err);
       });
-    // };
   }
 
   render() {

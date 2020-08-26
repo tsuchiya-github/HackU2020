@@ -11,6 +11,7 @@ export const createTodo = /* GraphQL */ `
       name
       description
       completed
+      cognitoID
       createdAt
       updatedAt
     }
@@ -27,6 +28,7 @@ export const updateTodo = /* GraphQL */ `
       description
       completed
       archive
+      cognitoID
       createdAt
       updatedAt
     }
@@ -43,8 +45,54 @@ export const deleteTodo = /* GraphQL */ `
       description
       completed
       archive
+      cognitoID
       createdAt
       updatedAt
+    }
+  }
+`;
+
+export const deleteInfo = /* GraphQL */ `
+  mutation DeleteInfo(
+    $input: DeleteInfoInput!
+    $condition: ModelInfoConditionInput
+  ) {
+    deleteInfo(input: $input, condition: $condition) {
+      cognitoID
+      type
+      gen
+      age
+      lv
+    }
+  }
+`;
+
+export const updateInfo = /* GraphQL */ `
+  mutation updateInfo(
+    $input: UpdateInfoInput
+    $condition: ModelInfoConditionInput
+  ) {
+    updateInfo(input: $input, condition: $condition) {
+      cognitoID
+      type
+      gen
+      age
+      lv
+    }
+  }
+`;
+
+export const createInfo = /* GraphQL */ `
+  mutation CreateInfo(
+    $input: CreateInfoInput!
+    $condition: ModelInfoConditionInput
+  ) {
+    createInfo(input: $input, condition: $condition) {
+      cognitoID
+      type
+      gen
+      age
+      lv
     }
   }
 `;

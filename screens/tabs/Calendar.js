@@ -16,20 +16,26 @@ import {
   Icon,
   Fab,
   DatePicker,
+  Toast,
 } from "native-base";
 import Swipeout from "react-native-swipeout";
+import { Auth } from "aws-amplify";
 
 import { API, graphqlOperation } from "aws-amplify";
 import {
   createTodo,
   deleteTodo,
   updateTodo,
+  updateInfo,
+  deleteInfo,
+  createInfo,
 } from "./../../src/graphql/mutations";
 import {
   listTodos,
   showlistTodos,
   listCounts,
   archiveCounts,
+  ListInfo,
 } from "./../../src/graphql/queries";
 
 const initialState = {
@@ -37,7 +43,18 @@ const initialState = {
   description: "",
   completed: false,
   archive: false,
+  cognitoID: "",
 }; //createするデータの初期値
+
+const timeState = {
+  current: new Date().toLocaleString(), // 現時刻
+  year: new Date().getFullYear(), // 年
+  month: new Date().getMonth() + 1, // 月
+  date: new Date().getDate(), // 日
+  hours: new Date().getHours(), // 時
+  minutes: new Date().getMinutes(), // 分
+  seconds: new Date().getSeconds(), // 秒
+};
 
 const App = () => {
   // Hook(stateなどのReactの機能をクラスを書かずに使えるようになる)
@@ -45,6 +62,39 @@ const App = () => {
   const [todos, setTodos] = useState([]); //dynamoからfetchするデータに関する宣言
   const [total, setTotal] = useState(null); //dynamoからcountするデータに関する宣言
   const [archive, setArchive] = useState(null); //dynamoからcountするデータに関する宣言
+  var [time, setTimes] = useState([]);
+  var [totaltime, setTotalTime] = useState(0);
+  var [lv, setUpdateInfo] = useState(1);
+
+  var EXPTABLE = [0, 150, 400, 650, 1500, 2100, 2800, 3600]; //lv.1,2,3,4,5,6,7,8
+
+  ///////現在時刻取得系//////
+  const [now, setNow] = useState(timeState);
+  const [nows, setNows] = useState([]);
+
+  useEffect(
+    function () {
+      const intervalId = setInterval(function () {
+        // now.current = new Date().toLocaleString(); // 現時刻
+        now.year = new Date().getFullYear(); // 年
+        now.month = ("0" + (new Date().getMonth() + 1)).slice(-2); // 月
+        now.date = new Date().getDate(); // 日
+        // now.week = weekday[new Date().getDay()]; // 曜日
+        now.hours = new Date().getHours(); // 時
+        now.minutes = ("0" + new Date().getMinutes()).slice(-2); // 分
+        // now.seconds = new Date().getSeconds(); // 秒
+
+        const hoge = { ...now };
+        setNows([...nows, hoge]);
+        setNow(timeState);
+      }, 1000);
+      return function () {
+        clearInterval(intervalId);
+      };
+    },
+    [now]
+  );
+  ///////////
 
   // コンポーネントをレンダリングする際に外部サーバからAPIを経由してデータを取得したり
   // コンポーネントが更新する度に別の処理を実行することができる
@@ -58,39 +108,183 @@ const App = () => {
 
   // データを取得する非同期関数
   async function fetchTodos() {
+    //画面表示系
     try {
+      var result = await Auth.currentUserInfo();
+      result = JSON.stringify(result);
+      result = JSON.parse(result);
+
       const todoData = await API.graphql(graphqlOperation(showlistTodos));
       var todos = todoData.data.listTodos.items;
+      todos = todos.filter((data) => {
+        return data.cognitoID === result.id;
+      });
+
       todos.sort(function (a, b) {
         return new Date(a.name).getTime() - new Date(b.name).getTime();
       });
       setTodos(todos);
-
-      const countArchives = await API.graphql(graphqlOperation(archiveCounts));
-      const countA = countArchives.data.listTodos.items;
-      const archive = Object.keys(countA).length;
-      setArchive(archive);
-
-      const countTodos = await API.graphql(graphqlOperation(listCounts));
-      const countD = countTodos.data.listTodos.items;
-      const total = Object.keys(countD).length;
-      setTotal(total);
     } catch (err) {
       console.log("error fetching todos", err);
+    }
+
+    // アーカイブ数取得系
+    try {
+      const countArchives = await API.graphql(graphqlOperation(archiveCounts));
+      var countA = countArchives.data.listTodos.items;
+      countA = countA.filter((data) => {
+        return data.cognitoID === result.id;
+      });
+      const archive = Object.keys(countA).length;
+
+      setArchive(archive);
+    } catch (err) {
+      console.log("error fetching archive", err);
+    }
+
+    // タスククリア時間とDone取得系;
+    try {
+      const countTodos = await API.graphql(graphqlOperation(listCounts));
+      var countD = countTodos.data.listTodos.items;
+      countD = countD.filter((data) => {
+        return data.cognitoID === result.id;
+      });
+      const total = Object.keys(countD).length;
+
+      setTotal(total);
+      //時間差分取得ここから
+      setTimes((time = []));
+
+      if (total != 0) {
+        countD.map((todo, index) => {
+          const start_hour = parseInt(todo.name.substr(11, 2)) * 60;
+          const start_second = parseInt(todo.name.substr(14, 2));
+          const end_hour = parseInt(todo.name.substr(17, 2)) * 60;
+          const end_second = parseInt(todo.name.substr(20, 2));
+          var times = end_hour + end_second - (start_hour + start_second);
+          time.push(times);
+        });
+        setTimes(time);
+        // console.log(time);
+        const reducer = (accumulator, currentValue) =>
+          accumulator + currentValue;
+        totaltime = time.reduce(reducer);
+        console.log(totaltime);
+        setTotalTime(totaltime);
+      }
+
+      //8/25追加(Lv取得後Infoテーブルupdate処理)
+      if (EXPTABLE[0] <= totaltime && totaltime < EXPTABLE[1]) {
+        if (lv > 1) {
+          setUpdateInfo(lv);
+          // Alert.alert("Downgrade Lv.1");
+        }
+      } else if (EXPTABLE[1] <= totaltime && totaltime < EXPTABLE[2]) {
+        if (lv < 2) {
+          lv = 2;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.2");
+        } else if (lv > 2) {
+          lv = 2;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.2");
+        }
+      } else if (EXPTABLE[2] <= totaltime && totaltime < EXPTABLE[3]) {
+        if (lv < 3) {
+          lv = 3;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.3");
+        } else if (lv > 3) {
+          lv = 3;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.3");
+        }
+      } else if (EXPTABLE[3] <= totaltime && totaltime < EXPTABLE[4]) {
+        if (lv < 4) {
+          lv = 4;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.4");
+        } else if (lv > 4) {
+          lv = 4;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.4");
+        }
+      } else if (EXPTABLE[4] <= totaltime && totaltime < EXPTABLE[5]) {
+        if (lv < 5) {
+          lv = 5;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.2");
+        } else if (lv > 5) {
+          lv = 5;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.5");
+        }
+      } else if (EXPTABLE[5] <= totaltime && totaltime < EXPTABLE[6]) {
+        if (lv < 6) {
+          lv = 6;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.6");
+        } else if (lv > 6) {
+          lv = 6;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.6");
+        }
+      } else if (EXPTABLE[6] <= totaltime && totaltime < EXPTABLE[7]) {
+        if (lv < 7) {
+          lv = 7;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.2");
+        } else if (lv > 7) {
+          lv = 7;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.7");
+        }
+      } else {
+        if (lv < 8) {
+          lv = 8;
+          setUpdateInfo(lv);
+          Alert.alert("Upgrade Lv.8");
+        } else if (lv > 2) {
+          lv = 2;
+          setUpdateInfo(lv);
+          Alert.alert("Downgrade Lv.8");
+        }
+      }
+
+      await API.graphql(
+        graphqlOperation(updateInfo, {
+          input: {
+            cognitoID: String(result.id),
+            lv: lv,
+          },
+        })
+      );
+
+      console.log("updateInfo called!");
+
+      //ここまで
+    } catch (err) {
+      console.log("error time", err);
     }
   }
 
   // データを追加する非同期関数
   async function addTodo() {
     try {
+      result = await Auth.currentUserInfo();
+      result = JSON.stringify(result);
+      result = JSON.parse(result);
+      formState.cognitoID = result.id;
+
       const todo = { ...formState };
-      console.log(todo);
+      // console.log(todo);
       setTodos([...todos, todo]);
       setFormState(initialState);
+
       await API.graphql(graphqlOperation(createTodo, { input: todo }));
       fetchTodos();
     } catch (err) {
-      console.log("error creating todo:", err);
+      "error creating todo:", err;
     }
   }
 
@@ -123,12 +317,6 @@ const App = () => {
         })
       );
       fetchTodos();
-      // const countTodos = await API.graphql(graphqlOperation(listCounts));
-      // const counts = countTodos.data.listTodos.items;
-      // console.log("Trueの数:", Object.keys(counts).length);
-      // const total = Object.keys(counts).length;
-      // setTotal(total);
-      // console.log(counts);
     } catch (err) {
       console.log("error doneTodo:", err);
     }
@@ -147,12 +335,6 @@ const App = () => {
         })
       );
       fetchTodos();
-      // const countArchives = await API.graphql(graphqlOperation(archiveCounts));
-      // const counts = countArchives.data.listTodos.items;
-      // console.log("アーカイブの数:", Object.keys(counts).length);
-      // const archive = Object.keys(counts).length;
-      // setArchive(archive);
-      // console.log(counts);
     } catch (err) {
       console.log("error archive:", err);
     }
@@ -184,7 +366,7 @@ const App = () => {
         <Input
           onChangeText={(val) => setInput("name", val)}
           value={formState.name}
-          placeholder="MM/DD/YY HH:SS"
+          placeholder="MMMM/DD/YY HH:MM-HH:MM"
           placeholderTextColor="#d3d3d3"
         />
       </Item>
@@ -266,8 +448,34 @@ const App = () => {
                 }}
               >
                 <Body>
-                  <Text style={styles.todoName}>{todo.description}</Text>
-                  <Text>{todo.name}</Text>
+                  <Text style={styles.todoName}>
+                    {todo.description}&nbsp;
+                    {(() => {
+                      if (
+                        todo.name.substr(0, 4) === String(now.year) &&
+                        todo.name.substr(5, 2) === String(now.month) &&
+                        todo.name.substr(8, 2) === String(now.date)
+                      ) {
+                        const flag =
+                          (parseInt(todo.name.substr(11, 2)) - now.hours) * 60 +
+                          parseInt(todo.name.substr(14, 2)) -
+                          now.minutes;
+                        if (flag <= 360 && flag >= 0) {
+                          return (
+                            <Text style={{ color: "red", fontFamily: "arial" }}>
+                              {(parseInt(todo.name.substr(11, 2)) - now.hours) *
+                                60 +
+                                parseInt(todo.name.substr(14, 2)) -
+                                now.minutes}
+                              分後
+                            </Text>
+                          );
+                        }
+                        return false;
+                      }
+                    })()}
+                  </Text>
+                  <Text>{todo.name} &nbsp;</Text>
                 </Body>
               </CardItem>
             </Swipeout>
