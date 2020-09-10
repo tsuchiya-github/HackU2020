@@ -142,7 +142,7 @@ const App = () => {
   };
 
   useEffect(
-    //10秒毎に時刻取得，小さく設定し過ぎるのは×
+    //1秒毎に時刻取得
     function () {
       const intervalTime = setInterval(function () {
         // now.current = new Date().toLocaleString(); // 現時刻
@@ -152,12 +152,12 @@ const App = () => {
         // now.week = weekday[new Date().getDay()]; // 曜日
         now.hours = new Date().getHours(); // 時
         now.minutes = ("0" + new Date().getMinutes()).slice(-2); // 分
-        // now.seconds = new Date().getSeconds(); // 秒
+        now.seconds = new Date().getSeconds(); // 秒
 
         const hoge = { ...now };
         setNows([...nows, hoge]);
         setNow(timeState);
-      }, 20000);
+      }, 1000);
       return function () {
         clearInterval(intervalTime);
       };
@@ -171,7 +171,7 @@ const App = () => {
     const intervalComp = setInterval(function () {
       fetchInfos(); //コンポーネントが更新する度にdynamoからデータを取得する
       console.log("fetchInfo called!");
-    }, 60000);
+    }, 10000);
     return function () {
       clearInterval(intervalComp);
     };
@@ -203,29 +203,37 @@ const App = () => {
         return data.cognitoID === result.id;
       });
       todos.sort(function (a, b) {
-        return new Date(a.name).getTime() - new Date(b.name).getTime();
+        new Date(a.name.substr(0, 16)).getTime() -
+          new Date(b.name.substr(0, 16)).getTime();
       });
 
       rec_todos = todos.filter((data) => {
         return data.completed === false;
       });
+      // console.log(rec_todos);
+
       rec_todos.sort(function (a, b) {
-        return new Date(a.name).getTime() - new Date(b.name).getTime();
+        return (
+          new Date(a.name.substr(0, 16)).getTime() -
+          new Date(b.name.substr(0, 16)).getTime()
+        );
       });
-      console.log(rec_todos);
+      // console.log(rec_todos);
 
       if (Object.keys(rec_todos).length != 0) {
         // const num = Object.keys(rec_todos).length;
+        // console.log(rec_todos);
         rec_todo = rec_todos[0].description;
         setRecTodo(rec_todo);
       }
 
-      if (Object.keys(todos).length != 0) {
+      if (Object.keys(rec_todos).length != 0) {
         // console.log("Todoがあります");
-        console.log(rec_todo);
+        // console.log(rec_todo);
+
         setTimes((time = []));
 
-        todos.map((todo, index) => {
+        rec_todos.map((todo, index) => {
           if (
             todo.name.substr(0, 4) === String(now.year) &&
             todo.name.substr(5, 2) ===
@@ -249,6 +257,7 @@ const App = () => {
         setTimes(time); //時間配列
         rectime = time.reduce(aryMin); //時間配列の最小値取得
         setRecTime(rectime); //rec_timeに値反映
+        // console.log(time);
       } else {
         //todoがない時(一番最初)
         // console.log("Todoがありません");
@@ -278,7 +287,6 @@ const App = () => {
       rank = rank.map((rank) => rank.lv);
 
       var count = rank.length;
-      console.log(count);
 
       const all = { ...levelState };
       setRanks([...ranks, all]);
@@ -295,7 +303,6 @@ const App = () => {
       }
       setRanks([...ranks, all]);
       setFormState(levelState);
-      console.log(all);
 
       const ranking = [
         {
@@ -468,7 +475,6 @@ const App = () => {
               </Fab>
 
               <Image
-                //source={{ uri: 'https://hacku2020s3bucket144145-dev.s3-ap-northeast-1.amazonaws.com/hibi-test/mio'+x+'.jpeg' }}
                 // キャラクター
                 resizeMode="contain"
                 source={{
@@ -481,7 +487,7 @@ const App = () => {
               />
               <View style={styles.talkWrap}>
                 <TypeWriter typing={1} style={styles.talk}>
-                  {(() => {
+                  {/* {(() => {
                     if (rec_time % 3 === 0) {
                       //3で割った余りが0の時(レコメンド頻度減らすため)
                       if (rec_time <= 30 && rec_time > 0) {
@@ -503,6 +509,45 @@ const App = () => {
                       return "タスクが少ないかも...?\n追加しよう♪";
                     } else if (rec_time != null) {
                       return "タスクを追加してみよう♪";
+                    }
+                  })()} */}
+
+                  {(() => {
+                    if (rec_time <= 30 && rec_time > 0) {
+                      if (now.seconds <= 15 && now.seconds > 0) {
+                        return health_30[0];
+                      } else if (now.seconds <= 30 && now.seconds > 15) {
+                        return health_30[1];
+                      } else if (now.seconds <= 45 && now.seconds > 30) {
+                        return health_30[2];
+                      } else if (now.seconds <= 60 && now.seconds > 45) {
+                        return health_30[3];
+                      }
+                    } else if (rec_time <= 60 && rec_time > 30) {
+                      if (now.seconds <= 15 && now.seconds > 0) {
+                        return health_60[0];
+                      } else if (now.seconds <= 30 && now.seconds > 15) {
+                        return health_60[1];
+                      } else if (now.seconds <= 45 && now.seconds > 30) {
+                        return health_60[2];
+                      } else if (now.seconds <= 60 && now.seconds > 45) {
+                        return health_60[3];
+                      }
+                    } else if (rec_time <= 90 && rec_time > 60) {
+                      if (now.seconds <= 20 && now.seconds > 0) {
+                        return health_90[0];
+                      } else if (now.seconds <= 40 && now.seconds > 20) {
+                        return health_90[1];
+                      } else if (now.seconds <= 60 && now.seconds > 40) {
+                        return health_90[2];
+                      }
+                    }
+                    if (rec_time === 0) {
+                      return "「Account」で設定してね";
+                    } else if (rec_time === 10000) {
+                      return "タスクが少ないかも...?\n追加しよう♪";
+                    } else if (rec_time != null) {
+                      return "タスクを追加しよう!";
                     }
                   })()}
                 </TypeWriter>
@@ -537,11 +582,6 @@ export default class Home extends Component {
 
 const styles = StyleSheet.create({
   abovecontainer: {
-    // flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
-    // // backgroundColor: "hsla(210, 90%, 50%, 0.2)",
-    // backgroundColor: "white",
     flex: 1,
     flexDirection: "column",
   },

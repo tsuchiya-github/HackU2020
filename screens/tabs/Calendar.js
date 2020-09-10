@@ -121,7 +121,10 @@ const App = () => {
       });
 
       todos.sort(function (a, b) {
-        return new Date(a.name).getTime() - new Date(b.name).getTime();
+        return (
+          new Date(a.name.substr(0, 16)).getTime() -
+          new Date(b.name.substr(0, 16)).getTime()
+        );
       });
       setTodos(todos);
     } catch (err) {
