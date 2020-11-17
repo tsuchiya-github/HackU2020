@@ -1,5 +1,10 @@
 # [Hack U 中部大学2020](https://hacku.yahoo.co.jp/chubu2020/) 
 
+---
+<span style="color: red; ">「中部大学賞」を受賞しました!</span>
+
+[![](https://i.imgur.com/tDubAoE.jpg)](https://www.youtube.com/watch?v=x8g1sgeTSxQ&t=1110s)
+↑プレゼン動画
 
 ## チームひびてこ　「○○ごっち」
 * コロナで時間管理の重要性が高まっている
@@ -7,10 +12,6 @@
     * 開く習慣をつけさせたい(開くことに価値を見出す)
     * 普通のTodoアプリと区別化したい
     *  エンドユーザ毎に使い方が変わるものにしたい
-
-## 作業工程(重要！！)
-
-![](https://i.imgur.com/DJOm2yW.png)
 
 ### 新規性
 * 育成ゲーム要素+によるLIFE UPDATE
@@ -52,15 +53,9 @@
 ### 役割分担
 * フロント・バックともに協力してやる(お互いのスキルアップのため)
 
-## 画面構成(仮)
-![](https://i.imgur.com/S6Eu7DW.png)
-<!-- ![](https://i.imgur.com/dZe6dWg.gif) -->
-### デモ
-<img src="https://i.imgur.com/KeAgb8D.gif" width="256px">
 
 ## Todo
-* GoogleCalendarAPIとの紐付け(調べたけど分からん．上のデモみたいにreactにcalendarパッケージ有るから最悪紐付けなくてもいい)
-* リマインダーのCRUD操作(AppsyncでGraphQL)
+* CRUD操作(AppsyncでGraphQL)
 * AWSサービスとの紐付け(みんなでやる)
 * イラストどうするか(アプリのロゴ，キャラ等)
 * タスクをどのように決定するか(具体的な分岐処理とか難しそう)
