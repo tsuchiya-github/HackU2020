@@ -1,10 +1,9 @@
 # [Hack U 中部大学2020](https://hacku.yahoo.co.jp/chubu2020/) 
 
----
 <span style="color: red; ">「中部大学賞」を受賞しました!</span>
+<span style="color: red; ">ドラッグ選択で隠しテキストが見えます</span>
 
 [![](https://i.imgur.com/tDubAoE.jpg)](https://www.youtube.com/watch?v=x8g1sgeTSxQ&t=1110s)
-↑プレゼン動画
 
 ## チームひびてこ　「○○ごっち」
 * コロナで時間管理の重要性が高まっている
